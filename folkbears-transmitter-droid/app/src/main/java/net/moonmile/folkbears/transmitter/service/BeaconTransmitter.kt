@@ -29,19 +29,6 @@ class BeaconTransmitter(
     var major: Int = major
     var minor: Int = minor
 
-
-    init {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            // TempUserId の取得
-            // 先頭4バイトを16進数として変換
-            // major = tempUserId.substring(0, 4).toIntOrNull(16) ?: 0
-            // 次の4バイトを16進数として変換
-            // minor = tempUserId.substring(4, 8).toIntOrNull(16) ?: 0
-        }
-    }
-
-
     private fun startBeaconTransmission() {
         // Permission check (Android 12+ requires BLUETOOTH_ADVERTISE)
         val advertiseGranted = ContextCompat.checkSelfPermission(
@@ -62,6 +49,8 @@ class BeaconTransmitter(
             Log.e(TAG, "BluetoothAdapter disabled; enable Bluetooth and retry")
             return
         }
+
+        // 以下 org.altbeacon.beacon を利用しない方法も検討
 
         val support = org.altbeacon.beacon.BeaconTransmitter.checkTransmissionSupported(context)
         if (support != org.altbeacon.beacon.BeaconTransmitter.SUPPORTED) {
@@ -85,7 +74,6 @@ class BeaconTransmitter(
 
             // advertiseMode = AdvertiseSettings .ADVERTISE_MODE_LOW_LATENCY   // 発信間隔を最短に
             // advertiseTxPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_HIGH // 出力強め
-
             isConnectable = false                                          // 非コネクタブルに
         }
 

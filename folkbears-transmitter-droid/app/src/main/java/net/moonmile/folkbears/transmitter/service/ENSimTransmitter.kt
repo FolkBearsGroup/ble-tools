@@ -19,8 +19,9 @@ import java.util.UUID
  * TraceRepository から TempId を取得し、EN の Service Data としてアドバタイズする。
  */
 class ENSimTransmitter(
-    private val context: Context,
-    private val tempIdBytes: ByteArray = ByteArray(16)
+	private val context: Context,
+	tempIdBytes: ByteArray = ByteArray(16),
+	useAltService: Boolean = false
 ) {
 
 	companion object {
@@ -29,6 +30,9 @@ class ENSimTransmitter(
 		val SERVICE_UUID_ALT: UUID = UUID.fromString("0000FF00-0000-1000-8000-00805F9B34FB")
 		val SERVICE_DATA_UUID_ALT: UUID = UUID.fromString("00000001-0000-1000-8000-00805F9B34FB")
 	}
+
+    var useAltService: Boolean = useAltService
+    var tempIdBytes: ByteArray = tempIdBytes
 
 	private var advertiser: BluetoothLeAdvertiser? = null
 	private var advertiseCallback: AdvertiseCallback? = null
@@ -68,13 +72,14 @@ class ENSimTransmitter(
 			.setConnectable(false)
 			.build()
 
+		val targetUuid = if (useAltService) SERVICE_UUID_ALT else SERVICE_UUID
+		val dataUuidForPayload = if (useAltService) SERVICE_DATA_UUID_ALT else targetUuid
+
 		val data = AdvertiseData.Builder()
 			.setIncludeDeviceName(false)
 			.setIncludeTxPowerLevel(true)
-			.addServiceUuid(ParcelUuid(SERVICE_UUID))
-			.addServiceData(ParcelUuid(SERVICE_UUID), tempIdBytes)
-			.addServiceUuid(ParcelUuid(SERVICE_UUID_ALT))
-			.addServiceData(ParcelUuid(SERVICE_DATA_UUID_ALT), tempIdBytes)
+			.addServiceUuid(ParcelUuid(targetUuid))
+			.addServiceData(ParcelUuid(dataUuidForPayload), tempIdBytes)
 			.build()
 
 		advertiseCallback = object : AdvertiseCallback() {
