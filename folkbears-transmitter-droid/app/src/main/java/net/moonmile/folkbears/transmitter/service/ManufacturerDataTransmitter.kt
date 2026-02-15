@@ -18,13 +18,16 @@ import kotlinx.coroutines.launch
  */
 class ManufacturerDataTransmitter(
 	private val context: Context,
-	private val manufacturerId: Int = 0xFFFF,
-    private val tempIdBytes: ByteArray = ByteArray(16)
+	manufacturerId: Int = 0xFFFF,
+    tempIdBytes: ByteArray = ByteArray(16)
 ) {
 
 	companion object {
 		const val TAG = "ManufacturerDataTx"
 	}
+
+    var tempIdBytes: ByteArray = tempIdBytes
+    var manufacturerId: Int = manufacturerId
 
 	private var advertiser: BluetoothLeAdvertiser? = null
 	private var advertiseCallback: AdvertiseCallback? = null

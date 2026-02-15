@@ -30,6 +30,7 @@ import net.moonmile.folkbears.transmitter.ui.theme.FolkbearsTransmitterTheme
 import net.moonmile.folkbears.transmitter.service.BeaconTransmitter
 import net.moonmile.folkbears.transmitter.service.ENSimTransmitter
 import net.moonmile.folkbears.transmitter.service.GattAdvertise
+import net.moonmile.folkbears.transmitter.service.ManufacturerDataTransmitter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +65,7 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
             TransmitterTab.IBeacon -> IBeaconTransmitterTab()
             TransmitterTab.FolkBears -> FolkBearsTransmitterTab()
             TransmitterTab.EnApi -> EnApiTransmitterTab()
-            TransmitterTab.ManufacturerData -> TabPlaceholder("Manufacturer Data の送信設定やステータスをここに追加してください。")
+            TransmitterTab.ManufacturerData -> ManufacturerDataTransmitterTab()
         }
     }
 }
@@ -127,6 +128,78 @@ private fun IBeaconTransmitterTab() {
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 16.dp)
         )
+    }
+}
+
+@Composable
+private fun ManufacturerDataTransmitterTab() {
+    val context = LocalContext.current
+    var tempIdHex by rememberSaveable {
+        // 16 bytes random
+        var hex = ""
+        repeat(16) { hex += (0..0xFF).random().toString(16).uppercase().padStart(2, '0') }
+        mutableStateOf(hex)
+    }
+    var manufacturerIdHex by rememberSaveable { mutableStateOf("FFFF") }
+    var isAdvertising by rememberSaveable { mutableStateOf(false) }
+    val transmitter = remember(manufacturerIdHex, tempIdHex) {
+        val tempBytes = tempIdHex.toByteArrayFromHex()
+        val mId : Int = manufacturerIdHex.toIntOrNull(16) ?: 0xFFFF
+        ManufacturerDataTransmitter(context, manufacturerId = mId, tempIdBytes = tempBytes)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = if (isAdvertising) "Manufacturer Data 発信中" else "Manufacturer Data 停止中",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            OutlinedTextField(
+                value = manufacturerIdHex,
+                onValueChange = { manufacturerIdHex = it.filterHex(limit = 4) },
+                label = { Text("Manufacturer ID (hex)") },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            OutlinedTextField(
+                value = tempIdHex,
+                onValueChange = { tempIdHex = it.filterHex(limit = 32) },
+                label = { Text("TempId (32 hex chars)") },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            Switch(
+                checked = isAdvertising,
+                onCheckedChange = { checked ->
+                    if (checked) {
+                        val tempBytes = tempIdHex.toByteArrayFromHex()
+                        val mId : Int = manufacturerIdHex.toIntOrNull(16) ?: 0xFFFF
+                        transmitter.manufacturerId = mId
+                        transmitter.tempIdBytes = tempBytes
+
+                        transmitter.startTransmitter()
+                    } else {
+                        transmitter.stopTransmitter()
+                    }
+                    isAdvertising = checked
+                }
+            )
+            Text(
+                text = if (isAdvertising) "ON" else "OFF",
+                modifier = Modifier.padding(start = 8.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
@@ -200,15 +273,15 @@ private fun EnApiTransmitterTab() {
             style = MaterialTheme.typography.titleMedium
         )
 
-        OutlinedTextField(
-            value = tempIdHex,
-            onValueChange = { tempIdHex = it.filterHex(limit = 32) },
-            label = { Text("TempId (32 hex chars)") },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        )
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            OutlinedTextField(
+                value = tempIdHex,
+                onValueChange = { tempIdHex = it.filterHex(limit = 32) },
+                label = { Text("TempId (32 hex chars)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
         Row(modifier = Modifier.padding(top = 12.dp)) {
             Switch(
