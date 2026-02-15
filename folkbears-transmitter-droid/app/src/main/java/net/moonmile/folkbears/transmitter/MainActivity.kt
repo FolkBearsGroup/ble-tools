@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import net.moonmile.folkbears.transmitter.ui.theme.FolkbearsTransmitterTheme
 import net.moonmile.folkbears.transmitter.service.BeaconTransmitter
 import net.moonmile.folkbears.transmitter.service.ENSimTransmitter
+import net.moonmile.folkbears.transmitter.service.GattAdvertise
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +62,7 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
 
         when (selectedTab) {
             TransmitterTab.IBeacon -> IBeaconTransmitterTab()
-            TransmitterTab.FolkBears -> TabPlaceholder("FolkBears の送信設定やステータスをここに追加してください。")
+            TransmitterTab.FolkBears -> FolkBearsTransmitterTab()
             TransmitterTab.EnApi -> EnApiTransmitterTab()
             TransmitterTab.ManufacturerData -> TabPlaceholder("Manufacturer Data の送信設定やステータスをここに追加してください。")
         }
@@ -123,6 +124,49 @@ private fun IBeaconTransmitterTab() {
 
         Text(
             text = "UUID: ${BeaconTransmitter.SERVICE_UUID}",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
+}
+
+@Composable
+private fun FolkBearsTransmitterTab() {
+    val context = LocalContext.current
+    val advertiser = remember { GattAdvertise(context) }
+    var isAdvertising by rememberSaveable { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = if (isAdvertising) "FolkBears 発信中" else "FolkBears 停止中",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            Switch(
+                checked = isAdvertising,
+                onCheckedChange = { checked ->
+                    if (checked) {
+                        advertiser.startAdvertising()
+                    } else {
+                        advertiser.stopAdvertising()
+                    }
+                    isAdvertising = checked
+                }
+            )
+            Text(
+                text = if (isAdvertising) "ON" else "OFF",
+                modifier = Modifier.padding(start = 8.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Text(
+            text = "UUID: ${GattAdvertise.SERVICE_UUID}",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -231,7 +275,7 @@ private enum class TransmitterTab(val title: String) {
     IBeacon("iBeacon"),
     FolkBears("FolkBears"),
     EnApi("EN API"),
-    ManufacturerData("MD")
+    ManufacturerData("MfD")
 }
 
 @Preview(showBackground = true)
