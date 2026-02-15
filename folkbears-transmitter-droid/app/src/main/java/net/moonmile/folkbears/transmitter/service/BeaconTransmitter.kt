@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import org.altbeacon.beacon.Beacon
 import java.util.UUID
@@ -78,7 +79,16 @@ class BeaconTransmitter(
 
         // val beaconParser = BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT)
         val beaconParser = BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")
-        beaconTransmitter = org.altbeacon.beacon.BeaconTransmitter(context, beaconParser)
+        val beaconTransmitter = BeaconTransmitter(context, beaconParser).apply {
+            advertiseMode = AdvertiseSettings.ADVERTISE_MODE_LOW_POWER // 消費電力最小化
+            advertiseTxPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_LOW // 出力弱め
+
+            // advertiseMode = AdvertiseSettings .ADVERTISE_MODE_LOW_LATENCY   // 発信間隔を最短に
+            // advertiseTxPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_HIGH // 出力強め
+
+            isConnectable = false                                          // 非コネクタブルに
+        }
+
         try {
             beaconTransmitter?.startAdvertising(beacon, object : AdvertiseCallback() {
                 override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {

@@ -69,8 +69,8 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun IBeaconTransmitterTab() {
     val context = LocalContext.current
-    var majorHex by rememberSaveable { mutableStateOf("0000") }
-    var minorHex by rememberSaveable { mutableStateOf("0000") }
+    var majorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
+    var minorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
     val transmitter = remember(majorHex, minorHex) { BeaconTransmitter(context, major = majorHex.toIntOrNull(16) ?: 0, minor = minorHex.toIntOrNull(16) ?: 0) }
     var isAdvertising by rememberSaveable { mutableStateOf(false) }
 
