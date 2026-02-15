@@ -1,0 +1,630 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000112F50000000000001 /* folkbears-monitor-ios/ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000012F50000000000001 /* folkbears-monitor-ios/ContentView.swift */; };
+		A10000122F50000000000001 /* folkbears-monitor-ios/folkbears_monitor_iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000022F50000000000001 /* folkbears-monitor-ios/folkbears_monitor_iosApp.swift */; };
+		A10000132F50000000000001 /* folkbears-monitor-ios/service/BeaconScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000032F50000000000001 /* folkbears-monitor-ios/service/BeaconScan.swift */; };
+		A10000142F50000000000001 /* folkbears-monitor-ios/service/GattClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000042F50000000000001 /* folkbears-monitor-ios/service/GattClient.swift */; };
+		A10000152F50000000000001 /* folkbears-monitor-ios/service/ENSimScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000052F50000000000001 /* folkbears-monitor-ios/service/ENSimScan.swift */; };
+		A10000162F50000000000001 /* folkbears-monitor-ios/data/TraceDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000062F50000000000001 /* folkbears-monitor-ios/data/TraceDataEntity.swift */; };
+		A10000172F50000000000002 /* folkbears-monitor-ios/service/ManufacturerDataScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000072F50000000000002 /* folkbears-monitor-ios/service/ManufacturerDataScan.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7EB474E62F40035E000EF984 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7EB474D02F40035D000EF984 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7EB474D72F40035D000EF984;
+			remoteInfo = "folkbears-monitor-ios";
+		};
+		7EB474F02F40035E000EF984 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7EB474D02F40035D000EF984 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7EB474D72F40035D000EF984;
+			remoteInfo = "folkbears-monitor-ios";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		7EB474D82F40035D000EF984 /* folkbears-monitor-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "folkbears-monitor-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EB474E52F40035E000EF984 /* folkbears-monitor-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "folkbears-monitor-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EB474EF2F40035E000EF984 /* folkbears-monitor-iosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "folkbears-monitor-iosUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000012F50000000000001 /* folkbears-monitor-ios/ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/ContentView.swift"; sourceTree = "<group>"; };
+		A10000022F50000000000001 /* folkbears-monitor-ios/folkbears_monitor_iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/folkbears_monitor_iosApp.swift"; sourceTree = "<group>"; };
+		A10000032F50000000000001 /* folkbears-monitor-ios/service/BeaconScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/service/BeaconScan.swift"; sourceTree = "<group>"; };
+		A10000042F50000000000001 /* folkbears-monitor-ios/service/GattClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/service/GattClient.swift"; sourceTree = "<group>"; };
+		A10000052F50000000000001 /* folkbears-monitor-ios/service/ENSimScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/service/ENSimScan.swift"; sourceTree = "<group>"; };
+		A10000062F50000000000001 /* folkbears-monitor-ios/data/TraceDataEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/data/TraceDataEntity.swift"; sourceTree = "<group>"; };
+		A10000072F50000000000002 /* folkbears-monitor-ios/service/ManufacturerDataScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/service/ManufacturerDataScan.swift"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		7EB474DA2F40035D000EF984 /* folkbears-monitor-ios */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "folkbears-monitor-ios";
+			sourceTree = "<group>";
+		};
+		7EB474E82F40035E000EF984 /* folkbears-monitor-iosTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "folkbears-monitor-iosTests";
+			sourceTree = "<group>";
+		};
+		7EB474F22F40035E000EF984 /* folkbears-monitor-iosUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "folkbears-monitor-iosUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7EB474D52F40035D000EF984 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EB474E22F40035E000EF984 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EB474EC2F40035E000EF984 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7EB474CF2F40035D000EF984 = {
+			isa = PBXGroup;
+			children = (
+				7EB474DA2F40035D000EF984 /* folkbears-monitor-ios */,
+				7EB474E82F40035E000EF984 /* folkbears-monitor-iosTests */,
+				7EB474F22F40035E000EF984 /* folkbears-monitor-iosUITests */,
+				7EB474D92F40035D000EF984 /* Products */,
+				7EB475742F40556C000EF984 /* Recovered References */,
+			);
+			sourceTree = "<group>";
+		};
+		7EB474D92F40035D000EF984 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7EB474D82F40035D000EF984 /* folkbears-monitor-ios.app */,
+				7EB474E52F40035E000EF984 /* folkbears-monitor-iosTests.xctest */,
+				7EB474EF2F40035E000EF984 /* folkbears-monitor-iosUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7EB475742F40556C000EF984 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				A10000012F50000000000001 /* folkbears-monitor-ios/ContentView.swift */,
+				A10000022F50000000000001 /* folkbears-monitor-ios/folkbears_monitor_iosApp.swift */,
+				A10000032F50000000000001 /* folkbears-monitor-ios/service/BeaconScan.swift */,
+				A10000042F50000000000001 /* folkbears-monitor-ios/service/GattClient.swift */,
+				A10000052F50000000000001 /* folkbears-monitor-ios/service/ENSimScan.swift */,
+				A10000062F50000000000001 /* folkbears-monitor-ios/data/TraceDataEntity.swift */,
+				A10000072F50000000000002 /* folkbears-monitor-ios/service/ManufacturerDataScan.swift */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7EB474D72F40035D000EF984 /* folkbears-monitor-ios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7EB474F92F40035E000EF984 /* Build configuration list for PBXNativeTarget "folkbears-monitor-ios" */;
+			buildPhases = (
+				7EB474D42F40035D000EF984 /* Sources */,
+				7EB474D52F40035D000EF984 /* Frameworks */,
+				7EB474D62F40035D000EF984 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7EB474DA2F40035D000EF984 /* folkbears-monitor-ios */,
+			);
+			name = "folkbears-monitor-ios";
+			packageProductDependencies = (
+			);
+			productName = "folkbears-monitor-ios";
+			productReference = 7EB474D82F40035D000EF984 /* folkbears-monitor-ios.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7EB474E42F40035E000EF984 /* folkbears-monitor-iosTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7EB474FC2F40035E000EF984 /* Build configuration list for PBXNativeTarget "folkbears-monitor-iosTests" */;
+			buildPhases = (
+				7EB474E12F40035E000EF984 /* Sources */,
+				7EB474E22F40035E000EF984 /* Frameworks */,
+				7EB474E32F40035E000EF984 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7EB474E72F40035E000EF984 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7EB474E82F40035E000EF984 /* folkbears-monitor-iosTests */,
+			);
+			name = "folkbears-monitor-iosTests";
+			packageProductDependencies = (
+			);
+			productName = "folkbears-monitor-iosTests";
+			productReference = 7EB474E52F40035E000EF984 /* folkbears-monitor-iosTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7EB474EE2F40035E000EF984 /* folkbears-monitor-iosUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7EB474FF2F40035E000EF984 /* Build configuration list for PBXNativeTarget "folkbears-monitor-iosUITests" */;
+			buildPhases = (
+				7EB474EB2F40035E000EF984 /* Sources */,
+				7EB474EC2F40035E000EF984 /* Frameworks */,
+				7EB474ED2F40035E000EF984 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7EB474F12F40035E000EF984 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7EB474F22F40035E000EF984 /* folkbears-monitor-iosUITests */,
+			);
+			name = "folkbears-monitor-iosUITests";
+			packageProductDependencies = (
+			);
+			productName = "folkbears-monitor-iosUITests";
+			productReference = 7EB474EF2F40035E000EF984 /* folkbears-monitor-iosUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7EB474D02F40035D000EF984 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					7EB474D72F40035D000EF984 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					7EB474E42F40035E000EF984 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 7EB474D72F40035D000EF984;
+					};
+					7EB474EE2F40035E000EF984 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 7EB474D72F40035D000EF984;
+					};
+				};
+			};
+			buildConfigurationList = 7EB474D32F40035D000EF984 /* Build configuration list for PBXProject "folkbears-monitor-ios" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7EB474CF2F40035D000EF984;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7EB474D92F40035D000EF984 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7EB474D72F40035D000EF984 /* folkbears-monitor-ios */,
+				7EB474E42F40035E000EF984 /* folkbears-monitor-iosTests */,
+				7EB474EE2F40035E000EF984 /* folkbears-monitor-iosUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7EB474D62F40035D000EF984 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EB474E32F40035E000EF984 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EB474ED2F40035E000EF984 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7EB474D42F40035D000EF984 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000112F50000000000001 /* folkbears-monitor-ios/ContentView.swift in Sources */,
+				A10000122F50000000000001 /* folkbears-monitor-ios/folkbears_monitor_iosApp.swift in Sources */,
+				A10000132F50000000000001 /* folkbears-monitor-ios/service/BeaconScan.swift in Sources */,
+				A10000142F50000000000001 /* folkbears-monitor-ios/service/GattClient.swift in Sources */,
+				A10000152F50000000000001 /* folkbears-monitor-ios/service/ENSimScan.swift in Sources */,
+				A10000162F50000000000001 /* folkbears-monitor-ios/data/TraceDataEntity.swift in Sources */,
+				A10000172F50000000000002 /* folkbears-monitor-ios/service/ManufacturerDataScan.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EB474E12F40035E000EF984 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7EB474EB2F40035E000EF984 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7EB474E72F40035E000EF984 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7EB474D72F40035D000EF984 /* folkbears-monitor-ios */;
+			targetProxy = 7EB474E62F40035E000EF984 /* PBXContainerItemProxy */;
+		};
+		7EB474F12F40035E000EF984 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7EB474D72F40035D000EF984 /* folkbears-monitor-ios */;
+			targetProxy = 7EB474F02F40035E000EF984 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		7EB474F72F40035E000EF984 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7EB474F82F40035E000EF984 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7EB474FA2F40035E000EF984 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "iBeacon 受信と周辺デバイス検出のために Bluetooth を使用します。";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "周辺の FolkBears デバイスを検出・接続するために Bluetooth を使用します。";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "バックグラウンドでも iBeacon を受信するために位置情報への常時アクセスが必要です。";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "iBeacon を受信するために位置情報へのアクセスが必要です。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.moonmile.folkbears-monitor-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7EB474FB2F40035E000EF984 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "iBeacon 受信と周辺デバイス検出のために Bluetooth を使用します。";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "周辺の FolkBears デバイスを検出・接続するために Bluetooth を使用します。";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "バックグラウンドでも iBeacon を受信するために位置情報への常時アクセスが必要です。";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "iBeacon を受信するために位置情報へのアクセスが必要です。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.moonmile.folkbears-monitor-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7EB474FD2F40035E000EF984 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.moonmile.folkbears-monitor-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/folkbears-monitor-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/folkbears-monitor-ios";
+			};
+			name = Debug;
+		};
+		7EB474FE2F40035E000EF984 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.moonmile.folkbears-monitor-iosTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/folkbears-monitor-ios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/folkbears-monitor-ios";
+			};
+			name = Release;
+		};
+		7EB475002F40035E000EF984 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.moonmile.folkbears-monitor-iosUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "folkbears-monitor-ios";
+			};
+			name = Debug;
+		};
+		7EB475012F40035E000EF984 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U2EKM66A44;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.moonmile.folkbears-monitor-iosUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "folkbears-monitor-ios";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7EB474D32F40035D000EF984 /* Build configuration list for PBXProject "folkbears-monitor-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EB474F72F40035E000EF984 /* Debug */,
+				7EB474F82F40035E000EF984 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7EB474F92F40035E000EF984 /* Build configuration list for PBXNativeTarget "folkbears-monitor-ios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EB474FA2F40035E000EF984 /* Debug */,
+				7EB474FB2F40035E000EF984 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7EB474FC2F40035E000EF984 /* Build configuration list for PBXNativeTarget "folkbears-monitor-iosTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EB474FD2F40035E000EF984 /* Debug */,
+				7EB474FE2F40035E000EF984 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7EB474FF2F40035E000EF984 /* Build configuration list for PBXNativeTarget "folkbears-monitor-iosUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EB475002F40035E000EF984 /* Debug */,
+				7EB475012F40035E000EF984 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7EB474D02F40035D000EF984 /* Project object */;
+}
