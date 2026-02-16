@@ -1,0 +1,5 @@
+{
+  "java.home": "D:/java/jdk-17",
+  "kotlin.languageServer.enabled": true,
+  "java.configuration.updateBuildConfiguration": "interactive"
+}
