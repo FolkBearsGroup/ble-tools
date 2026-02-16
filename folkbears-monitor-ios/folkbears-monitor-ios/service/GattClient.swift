@@ -12,7 +12,8 @@ import CoreData
 
 class GattClient: NSObject, ObservableObject {
     private var centralManager: CBCentralManager?
-    private var discoveredPeripherals: [CBPeripheral] = []
+    // モニタリングのため重複を許す
+    // private var discoveredPeripherals: [CBPeripheral] = []
     private var connectedPeripheral: CBPeripheral?
     private var targetService: CBService?
     private var targetCharacteristic: CBCharacteristic?
@@ -70,11 +71,11 @@ class GattClient: NSObject, ObservableObject {
         }
         
         peripherals.removeAll()
-        discoveredPeripherals.removeAll()
+        // discoveredPeripherals.removeAll()
         
         // 特定のサービスUUIDでスキャン（nilで全デバイス）
         centralManager.scanForPeripherals(withServices: [targetServiceUUID], options: [
-            CBCentralManagerScanOptionAllowDuplicatesKey: false
+            CBCentralManagerScanOptionAllowDuplicatesKey: true // 重複を許可してスキャン
         ])
         
         isScanning = true
@@ -209,9 +210,9 @@ extension GattClient: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         
         // 重複チェック
-        if !discoveredPeripherals.contains(where: { $0.identifier == peripheral.identifier }) {
-            discoveredPeripherals.append(peripheral)
-            
+        // if !discoveredPeripherals.contains(where: { $0.identifier == peripheral.identifier }) {
+        //   discoveredPeripherals.append(peripheral)
+        if ( true ) {    
             let name = peripheral.name ?? advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? ""
             
             let discoveredPeripheral = DiscoveredPeripheral(
