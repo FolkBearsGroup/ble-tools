@@ -46,9 +46,22 @@
 		A10000072F50000000000002 /* folkbears-monitor-ios/service/ManufacturerDataScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "folkbears-monitor-ios/service/ManufacturerDataScan.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7E052D432F440A6C003E26E8 /* Exceptions for "folkbears-monitor-ios" folder in "folkbears-monitor-ios" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7EB474D72F40035D000EF984 /* folkbears-monitor-ios */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7EB474DA2F40035D000EF984 /* folkbears-monitor-ios */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7E052D432F440A6C003E26E8 /* Exceptions for "folkbears-monitor-ios" folder in "folkbears-monitor-ios" target */,
+			);
 			path = "folkbears-monitor-ios";
 			sourceTree = "<group>";
 		};
@@ -438,15 +451,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U2EKM66A44;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "iBeacon 受信と周辺デバイス検出のために Bluetooth を使用します。";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "周辺の FolkBears デバイスを検出・接続するために Bluetooth を使用します。";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "バックグラウンドでも iBeacon を受信するために位置情報への常時アクセスが必要です。";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "iBeacon を受信するために位置情報へのアクセスが必要です。";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "folkbears-monitor-ios/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -474,15 +480,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U2EKM66A44;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "iBeacon 受信と周辺デバイス検出のために Bluetooth を使用します。";
-				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "周辺の FolkBears デバイスを検出・接続するために Bluetooth を使用します。";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "バックグラウンドでも iBeacon を受信するために位置情報への常時アクセスが必要です。";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "iBeacon を受信するために位置情報へのアクセスが必要です。";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "folkbears-monitor-ios/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
