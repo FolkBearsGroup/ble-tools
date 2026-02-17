@@ -17,14 +17,14 @@ struct ContentView: View {
                     Label("Beacon", systemImage: "antenna.radiowaves.left.and.right")
                 }
 
-            ENTabView()
-                .tabItem {
-                    Label("EN API", systemImage: "wave.3.right")
-                }
-
             FolkBearsTabView()
                 .tabItem {
                     Label("FolkBears", systemImage: "bear")
+                }
+
+            ENTabView()
+                .tabItem {
+                    Label("EN API", systemImage: "wave.3.right")
                 }
 
             MfDTabView()
@@ -92,6 +92,7 @@ struct BeaconTabView: View {
 
 struct ENTabView: View {
     @StateObject private var transmitter = ENSimTransmitter()
+    @State private var rpiHex: String = ""
 
     var body: some View {
         NavigationView {
@@ -117,6 +118,13 @@ struct ENTabView: View {
                         .autocorrectionDisabled(true)
                         .font(.system(.body, design: .monospaced))
                     Toggle("代替サービス UUID を使う", isOn: $transmitter.useAltService)
+
+                    TextField("RPI (32 hex)", text: $rpiHex )
+                        .textInputAutocapitalization(.none)
+                        .autocorrectionDisabled(true)
+                        .font(.system(.body, design: .monospaced))
+                        .onSubmit(applyRpi)
+
                 }
 
                 Section(header: Text("操作")) {
@@ -135,11 +143,27 @@ struct ENTabView: View {
                         }
                         .disabled(!transmitter.isTransmitting)
                     }
+                    HStack {
+                        Text ("EN API が 動作しないことを確認")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .navigationTitle("EN API")
+            .onAppear(perform: syncFieldsFromModel)
         }
     }
+    private func syncFieldsFromModel() {
+        rpiHex = transmitter.rpi.map { String(format: "%02X", $0) }.joined()
+    }
+    private func applyRpi() {
+        let cleaned = rpiHex.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "").uppercased()
+        guard let data = Data(hexString: cleaned, expectedLength: 16) else { return }
+        transmitter.rpi = data
+        rpiHex = cleaned
+    }
+
 }
 
 struct FolkBearsTabView: View {
@@ -262,6 +286,12 @@ struct MfDTabView: View {
                         }
                         .disabled(!transmitter.isTransmitting)
                     }
+                                        HStack {
+                    Text ("Manufacturer Data が 動作しないことを確認")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    }
+
                 }
             }
             .navigationTitle("MfD")

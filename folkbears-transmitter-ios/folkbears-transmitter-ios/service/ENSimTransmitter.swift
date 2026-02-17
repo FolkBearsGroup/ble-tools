@@ -13,15 +13,14 @@ import Combine
 class ENSimTransmitter: NSObject, ObservableObject {
 	private var peripheralManager: CBPeripheralManager?
 	private let serviceUUID = CBUUID(string: "FD6F") // Exposure Notification 16-bit UUID
-    private let serviceDataUUID = CBUUID(string: "FD6F") // Custom UUID for service data
     private let altServiceUUID = CBUUID(string: "FF00") // Alternative UUID for testing
-    private let altServiceDataUUID = CBUUID(string: "0001") // Alternative UUID for service data
 
 	@Published var isTransmitting = false
 	@Published var transmissionStatus = "停止中"
 	@Published var bluetoothState = "Unknown"
 	@Published var localName = "ENSim"
     @Published var useAltService: Bool = false
+	@Published var rpi: Data = ENSimTransmitter.generateRandomRpi()
 
 	override init() {
 		super.init()
@@ -48,9 +47,13 @@ class ENSimTransmitter: NSObject, ObservableObject {
 			return
 		}
 
+        let selectedService = useAltService ? altServiceUUID : serviceUUID
+        let serviceData: [CBUUID: Data] = [selectedService: rpi]
+
 		let advertisementData: [String: Any] = [
-			CBAdvertisementDataServiceUUIDsKey: [useAltService ? altServiceDataUUID : serviceUUID],
-			CBAdvertisementDataLocalNameKey: localName
+			CBAdvertisementDataServiceUUIDsKey: [selectedService],
+			CBAdvertisementDataLocalNameKey: localName,
+			// CBAdvertisementDataServiceDataKey: serviceData
 		]
 
 		manager.startAdvertising(advertisementData)
@@ -61,6 +64,7 @@ class ENSimTransmitter: NSObject, ObservableObject {
 		print("📡 EN シミュレーション発信開始")
 		print("   Service UUID (16-bit): \(useAltService ? altServiceUUID.uuidString : serviceUUID.uuidString)")
 		print("   Local Name: \(localName)")
+		print("   RPI (hex): \(rpi.map { String(format: "%02X", $0) }.joined())")
 	}
 
 	func stopTransmitting() {
@@ -71,6 +75,19 @@ class ENSimTransmitter: NSObject, ObservableObject {
 		transmissionStatus = "停止中"
 
 		print("EN シミュレーション発信停止")
+	}
+
+	private static func generateRandomRpi() -> Data {
+		
+		// let bytes = (0..<16).map { _ in UInt8.random(in: 0...255) }
+
+		// ランダムな uuid を生成して RPI として使用（デバッグ用）
+		// 送信は成功するが、Service Data の内容はランダム値になってしまうので、
+		// 実質利用ができない。
+		let uuid = UUID()
+		let uuidBytes = withUnsafeBytes(of: uuid.uuid) { Array($0) }
+		let bytes = Array(uuidBytes.prefix(16))
+		return Data(bytes)
 	}
 }
 
