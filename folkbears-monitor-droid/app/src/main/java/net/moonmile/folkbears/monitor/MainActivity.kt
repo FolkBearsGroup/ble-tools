@@ -66,6 +66,9 @@ class MainActivity : ComponentActivity() {
 fun MonitorScreen(modifier: Modifier = Modifier) {
     var selectedTab by rememberSaveable { mutableStateOf(MonitorTab.IBeacon) }
     var iBeaconScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
+    var folkScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
+    var enApiScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
+    var mdScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
 
     Column(modifier = modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab.ordinal) {
@@ -83,9 +86,18 @@ fun MonitorScreen(modifier: Modifier = Modifier) {
                 scanMode = iBeaconScanMode,
                 onScanModeChange = { iBeaconScanMode = it }
             )
-            MonitorTab.FolkBears -> FolkBearsTabContent()
-            MonitorTab.EnApi -> EnApiTabContent()
-            MonitorTab.ManufacturerData -> ManufacturerDataTabContent()
+            MonitorTab.FolkBears -> FolkBearsTabContent(
+                scanMode = folkScanMode,
+                onScanModeChange = { folkScanMode = it }
+            )
+            MonitorTab.EnApi -> EnApiTabContent(
+                scanMode = enApiScanMode,
+                onScanModeChange = { enApiScanMode = it }
+            )
+            MonitorTab.ManufacturerData -> ManufacturerDataTabContent(
+                scanMode = mdScanMode,
+                onScanModeChange = { mdScanMode = it }
+            )
         }
     }
 }
@@ -239,18 +251,22 @@ private fun IBeaconTabContent(
 }
 
 @Composable
-private fun EnApiTabContent() {
+private fun EnApiTabContent(
+    scanMode: Int,
+    onScanModeChange: (Int) -> Unit
+) {
     val context = LocalContext.current
     val scan = remember { ENSimScan(context) }
     val ads: SnapshotStateList<TraceDataEntity> = remember { mutableStateListOf() }
     val windowMs = 5 * 60 * 1000L // 5 minutes
 
-    LaunchedEffect(scan) {
+    LaunchedEffect(scan, scanMode) {
+        scan.stopScan()
         scan.onReadTraceData = { ad ->
             ads.add(ad)
             pruneOldTrace(ads, windowMs)
         }
-        scan.startScan()
+        scan.startScan(scanMode)
     }
 
     LaunchedEffect(ads) {
@@ -262,6 +278,52 @@ private fun EnApiTabContent() {
 
     DisposableEffect(Unit) {
         onDispose { scan.stopScan() }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "スキャンモード",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        var expanded by remember { mutableStateOf(false) }
+        val modes = listOf(
+            ScanSettings.SCAN_MODE_LOW_POWER to "Low Power",
+            ScanSettings.SCAN_MODE_BALANCED to "Balanced",
+            ScanSettings.SCAN_MODE_LOW_LATENCY to "Low Latency",
+        )
+        val currentLabel = modes.find { it.first == scanMode }?.second ?: "Low Power"
+
+        androidx.compose.material3.OutlinedButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(currentLabel)
+        }
+
+        if (expanded) {
+            androidx.compose.material3.DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                modes.forEach { (mode, label) ->
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            onScanModeChange(mode)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 
     val grouped = ads.groupBy { it.tempId }
@@ -285,7 +347,10 @@ private fun EnApiTabContent() {
 }
 
 @Composable
-private fun ManufacturerDataTabContent() {
+private fun ManufacturerDataTabContent(
+    scanMode: Int,
+    onScanModeChange: (Int) -> Unit
+) {
     val context = LocalContext.current
     val manufacturerId = 0xFFFF // Adjust if targeting a different vendor
     val scan = remember { ManufacturerDataScan(context, manufacturerId) }
@@ -299,13 +364,14 @@ private fun ManufacturerDataTabContent() {
         hasPermission = result.values.all { it }
     }
 
-    LaunchedEffect(scan, hasPermission) {
+    LaunchedEffect(scan, hasPermission, scanMode) {
         if (hasPermission) {
+            scan.stopScan()
             scan.onReadManufacturerData = { ad ->
                 ads.add(ad)
                 pruneOldManufacturer(ads, windowMs)
             }
-            scan.startScan()
+            scan.startScan(scanMode)
         }
     }
 
@@ -318,6 +384,52 @@ private fun ManufacturerDataTabContent() {
 
     DisposableEffect(hasPermission) {
         onDispose { scan.stopScan() }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "スキャンモード",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        var expanded by remember { mutableStateOf(false) }
+        val modes = listOf(
+            ScanSettings.SCAN_MODE_LOW_POWER to "Low Power",
+            ScanSettings.SCAN_MODE_BALANCED to "Balanced",
+            ScanSettings.SCAN_MODE_LOW_LATENCY to "Low Latency",
+        )
+        val currentLabel = modes.find { it.first == scanMode }?.second ?: "Low Power"
+
+        androidx.compose.material3.OutlinedButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(currentLabel)
+        }
+
+        if (expanded) {
+            androidx.compose.material3.DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                modes.forEach { (mode, label) ->
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            onScanModeChange(mode)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 
     if (!hasPermission) {
@@ -370,13 +482,17 @@ private fun ManufacturerDataTabContent() {
 }
 
 @Composable
-private fun FolkBearsTabContent() {
+private fun FolkBearsTabContent(
+    scanMode: Int,
+    onScanModeChange: (Int) -> Unit
+) {
     val context = LocalContext.current
     val client = remember { GattClient(context) }
     val hits: SnapshotStateList<FolkDeviceHit> = remember { mutableStateListOf() }
     val windowMs = 5 * 60 * 1000L // 5 minutes
 
-    LaunchedEffect(client) {
+    LaunchedEffect(client, scanMode) {
+        client.stopSearchDevice()
         client.onScanGattDevice = { mac, result ->
             val name = result.device.name ?: "(no name)"
             hits.add(
@@ -389,7 +505,7 @@ private fun FolkBearsTabContent() {
             )
             pruneOldFolk(hits, windowMs)
         }
-        client.startSearchDevice()
+        client.startSearchDevice(scanMode)
     }
 
     LaunchedEffect(hits) {
@@ -401,6 +517,52 @@ private fun FolkBearsTabContent() {
 
     DisposableEffect(Unit) {
         onDispose { client.stopSearchDevice() }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "スキャンモード",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        var expanded by remember { mutableStateOf(false) }
+        val modes = listOf(
+            ScanSettings.SCAN_MODE_LOW_POWER to "Low Power",
+            ScanSettings.SCAN_MODE_BALANCED to "Balanced",
+            ScanSettings.SCAN_MODE_LOW_LATENCY to "Low Latency",
+        )
+        val currentLabel = modes.find { it.first == scanMode }?.second ?: "Low Power"
+
+        androidx.compose.material3.OutlinedButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(currentLabel)
+        }
+
+        if (expanded) {
+            androidx.compose.material3.DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                modes.forEach { (mode, label) ->
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            onScanModeChange(mode)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 
     val grouped = hits.groupBy { it.mac }

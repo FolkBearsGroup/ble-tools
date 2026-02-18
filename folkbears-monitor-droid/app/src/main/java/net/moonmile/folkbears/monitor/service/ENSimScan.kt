@@ -30,6 +30,7 @@ class ENSimScan(
     }
 
     private val traceDeviceRepository = TraceDeviceRepository()
+    private var scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER
     private var scanner: BluetoothLeScanner? = null
     private var scanCallback: ScanCallback? = null
 
@@ -51,7 +52,7 @@ class ENSimScan(
             ScanFilter.Builder().setServiceUuid(serviceUuidAlt).build()
         )
         val scanSettings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            .setScanMode(scanMode)
             .build()
 
         scanCallback = object : ScanCallback() {
@@ -117,8 +118,9 @@ class ENSimScan(
     ///
     /// ENSim スキャンサービスを開始する
     ///
-    fun startScan() {
-        Log.d(TAG, "startScan")
+    fun startScan(scanMode: Int = this.scanMode) {
+        this.scanMode = scanMode
+        Log.d(TAG, "startScan mode=$scanMode")
         setupScan()
     }
 

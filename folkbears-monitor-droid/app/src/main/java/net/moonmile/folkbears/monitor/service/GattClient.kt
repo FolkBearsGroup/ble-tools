@@ -33,6 +33,7 @@ class GattClient(
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothScanner: BluetoothLeScanner? = null
     private var scanCallback: ScanCallback? = null
+    private var scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER
     private val traceDeviceRepository = TraceDeviceRepository()
 
     // スキャン結果を受け取るコールバック
@@ -48,9 +49,10 @@ class GattClient(
     ///
     /// @brief GATT クライアントサービスを開始する
     ///
-    fun startSearchDevice() 
+    fun startSearchDevice(scanMode: Int = this.scanMode) 
     {
-        Log.d(TAG, "startSearchDevice")
+        this.scanMode = scanMode
+        Log.d(TAG, "startSearchDevice mode=$scanMode")
         val scanFilter = ScanFilter.Builder()
             // TODO: SERVICE_UUID を提供しているデバイスを探す
             .setServiceUuid(ParcelUuid(SERVICE_UUID))
@@ -58,7 +60,7 @@ class GattClient(
 
         val scanSettings = ScanSettings.Builder()
             .setReportDelay(0)
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            .setScanMode(scanMode)
             .build()
 
         // デバイス名と時刻を保存するリスト
