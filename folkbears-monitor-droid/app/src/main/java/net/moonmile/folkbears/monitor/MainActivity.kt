@@ -37,6 +37,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import android.bluetooth.le.ScanSettings
 import net.moonmile.folkbears.monitor.data.IBeaconAdvertisement
 import net.moonmile.folkbears.monitor.data.TraceDataEntity
 import net.moonmile.folkbears.monitor.service.BeaconScan
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MonitorScreen(modifier: Modifier = Modifier) {
     var selectedTab by rememberSaveable { mutableStateOf(MonitorTab.IBeacon) }
+    var iBeaconScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
 
     Column(modifier = modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab.ordinal) {
@@ -77,7 +79,10 @@ fun MonitorScreen(modifier: Modifier = Modifier) {
         }
 
         when (selectedTab) {
-            MonitorTab.IBeacon -> IBeaconTabContent()
+            MonitorTab.IBeacon -> IBeaconTabContent(
+                scanMode = iBeaconScanMode,
+                onScanModeChange = { iBeaconScanMode = it }
+            )
             MonitorTab.FolkBears -> FolkBearsTabContent()
             MonitorTab.EnApi -> EnApiTabContent()
             MonitorTab.ManufacturerData -> ManufacturerDataTabContent()
@@ -97,7 +102,10 @@ private fun PlaceholderTab(text: String) {
 }
 
 @Composable
-private fun IBeaconTabContent() {
+private fun IBeaconTabContent(
+    scanMode: Int,
+    onScanModeChange: (Int) -> Unit
+) {
     val context = LocalContext.current
     val scan = remember { BeaconScan(context) }
     val ads: SnapshotStateList<IBeaconAdvertisement> = remember { mutableStateListOf() }
@@ -111,13 +119,14 @@ private fun IBeaconTabContent() {
     }
 
     // Collect scan results
-    LaunchedEffect(scan) {
+    LaunchedEffect(scan, hasPermission, scanMode) {
         if (hasPermission) {
+            scan.stopScan()
             scan.onIBeacon = { ad ->
                 ads.add(ad)
                 pruneOld(ads, windowMs)
             }
-            scan.startScan()
+            scan.startScan(scanMode)
         }
     }
 
@@ -134,6 +143,51 @@ private fun IBeaconTabContent() {
         onDispose { scan.stopScan() }
     }
 
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = "スキャンモード",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            var expanded by remember { mutableStateOf(false) }
+            val modes = listOf(
+                ScanSettings.SCAN_MODE_LOW_POWER to "Low Power",
+                ScanSettings.SCAN_MODE_BALANCED to "Balanced",
+                ScanSettings.SCAN_MODE_LOW_LATENCY to "Low Latency",
+            )
+            val currentLabel = modes.find { it.first == scanMode }?.second ?: "Low Power"
+
+            androidx.compose.material3.OutlinedButton(
+                onClick = { expanded = !expanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            ) {
+                Text(currentLabel)
+            }
+
+            if (expanded) {
+                androidx.compose.material3.DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    modes.forEach { (mode, label) ->
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                onScanModeChange(mode)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
     if (!hasPermission) {
         Column(
             modifier = Modifier

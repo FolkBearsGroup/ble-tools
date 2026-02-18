@@ -37,6 +37,9 @@ class BeaconScan(
     }
     private val traceDeviceRepository = TraceDeviceRepository()
 
+    // Current scan mode (e.g., SCAN_MODE_LOW_POWER / SCAN_MODE_BALANCED / SCAN_MODE_LOW_LATENCY)
+    private var scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER
+
     private var scanner: BluetoothLeScanner? = null
     private var scanCallback : ScanCallback? = null
 
@@ -63,7 +66,7 @@ class BeaconScan(
             // .setServiceUuid(ParcelUuid(SERVICE_UUID)) // フィルターが効かない
             .build()
         val scanSettings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            .setScanMode(scanMode)
             .build()
 
         scanCallback = object : ScanCallback() {
@@ -167,8 +170,9 @@ class BeaconScan(
     ///
     /// @brief Beacon スキャンサービスを開始する
     ///
-    fun startScan() {
-        Log.d(TAG, "startScan")
+    fun startScan(scanMode: Int = this.scanMode) {
+        this.scanMode = scanMode
+        Log.d(TAG, "startScan mode=$scanMode")
         setupBeaconMonitoring()
     }
     ///
