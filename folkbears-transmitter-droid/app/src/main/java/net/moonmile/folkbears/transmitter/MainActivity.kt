@@ -1,6 +1,5 @@
 package net.moonmile.folkbears.transmitter
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -28,9 +27,8 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -63,14 +61,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TransmitterScreen(modifier: Modifier = Modifier) {
     var selectedTab by rememberSaveable { mutableStateOf(TransmitterTab.IBeacon) }
-    var advertiseModeIBeacon by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
-    var advertiseTxPowerIBeacon by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
-    var advertiseModeFolk by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
-    var advertiseTxPowerFolk by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
-    var advertiseModeEn by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
-    var advertiseTxPowerEn by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
-    var advertiseModeMd by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
-    var advertiseTxPowerMd by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
+    var advertiseModeIBeacon by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
+    var advertiseTxPowerIBeacon by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
+    var advertiseModeFolk by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
+    var advertiseTxPowerFolk by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
+    var advertiseModeEn by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
+    var advertiseTxPowerEn by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
+    var advertiseModeMd by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
+    var advertiseTxPowerMd by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
 
     Column(modifier = modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab.ordinal) {
@@ -113,13 +111,13 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
 }
 
 private fun hasScanPermissions(context: Context): Boolean {
-    val adv = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
-    val connect = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
-    val legacy = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED
-    val admin = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val adv = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+        val connect = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
         adv && connect
     } else {
+        val legacy = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED
+        val admin = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED
         legacy && admin
     }
 }
@@ -155,12 +153,6 @@ private fun IBeaconTransmitterTab(
     }
 
     // Collect scan results
-    LaunchedEffect(hasPermission) {
-        if (hasPermission) {
-            // 権限が設定されたときの初期化
-        }
-    }
-
     if (!hasPermission) {
         Column(
             modifier = Modifier
@@ -173,14 +165,21 @@ private fun IBeaconTransmitterTab(
             )
             Button(
                 onClick = {
-                    permissionLauncher.launch(
-                        arrayOf(
-                            android.Manifest.permission.BLUETOOTH_ADVERTISE,
-                            android.Manifest.permission.BLUETOOTH_CONNECT,
-                            android.Manifest.permission.BLUETOOTH,
-                            android.Manifest.permission.BLUETOOTH_ADMIN,
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                android.Manifest.permission.BLUETOOTH_ADVERTISE,
+                                android.Manifest.permission.BLUETOOTH_CONNECT,
+                            )
                         )
-                    )
+                    } else {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                android.Manifest.permission.BLUETOOTH,
+                                android.Manifest.permission.BLUETOOTH_ADMIN,
+                            )
+                        )
+                    }
                 },
                 modifier = Modifier.padding(top = 12.dp)
             ) {
@@ -281,8 +280,8 @@ private fun ManufacturerDataTransmitterTab(
         val mId : Int = manufacturerIdHex.toIntOrNull(16) ?: 0xFFFF
         ManufacturerDataTransmitter(context, manufacturerId = mId, tempIdBytes = tempBytes)
     }
-    var advertiseModeState by remember { mutableStateOf(advertiseMode) }
-    var advertisePowerState by remember { mutableStateOf(advertiseTxPowerLevel) }
+    var advertiseModeState by remember { mutableIntStateOf(advertiseMode) }
+    var advertisePowerState by remember { mutableIntStateOf(advertiseTxPowerLevel) }
     fun restartIfAdvertising() {
         if (isAdvertising) {
             transmitter.stopTransmitter()
@@ -377,8 +376,8 @@ private fun FolkBearsTransmitterTab(
     val advertiser = remember { GattAdvertise(context) }
     var isAdvertising by rememberSaveable { mutableStateOf(false) }
 
-    var advertiseModeState by remember { mutableStateOf(advertiseMode) }
-    var advertisePowerState by remember { mutableStateOf(advertiseTxPowerLevel) }
+    var advertiseModeState by remember { mutableIntStateOf(advertiseMode) }
+    var advertisePowerState by remember { mutableIntStateOf(advertiseTxPowerLevel) }
     fun restartIfAdvertising() {
         if (isAdvertising) {
             advertiser.stopAdvertising()
@@ -467,8 +466,8 @@ private fun EnApiTransmitterTab(
         val bytes = tempIdHex.toByteArrayFromHex()
         ENSimTransmitter(context, tempIdBytes = bytes, useAltService = useAlt)
     }
-    var advertiseModeState by remember { mutableStateOf(advertiseMode) }
-    var advertisePowerState by remember { mutableStateOf(advertiseTxPowerLevel) }
+    var advertiseModeState by remember { mutableIntStateOf(advertiseMode) }
+    var advertisePowerState by remember { mutableIntStateOf(advertiseTxPowerLevel) }
     fun restartIfAdvertising() {
         if (isAdvertising) {
             transmitter.stopTransmitter()
@@ -565,17 +564,6 @@ private fun String.toByteArrayFromHex(): ByteArray {
     return chunked(2)
         .mapNotNull { it.toIntOrNull(16)?.toByte() }
         .toByteArray()
-}
-
-@Composable
-private fun TabPlaceholder(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize()
-    )
 }
 
 private enum class TransmitterTab(val title: String) {
