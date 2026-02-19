@@ -37,6 +37,9 @@ class GattAdvertise(
     private var lastStopTime = 0L
     private var backgroundRetryRunnable: Runnable? = null
 
+    var advertiseMode: Int = AdvertiseSettings.ADVERTISE_MODE_LOW_POWER
+    var advertiseTxPowerLevel: Int = AdvertiseSettings.ADVERTISE_TX_POWER_LOW
+
 
     private var currentCallback: AdvertiseCallback? = null
 
@@ -83,13 +86,6 @@ class GattAdvertise(
         }
     }
 
-    private val settings = AdvertiseSettings.Builder()
-        .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
-        .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
-        .setConnectable(true)
-        // .setTimeout(0)
-        .build()
-
     private var data: AdvertiseData? = null
 
     fun startAdvertising() {
@@ -112,6 +108,12 @@ class GattAdvertise(
             .build()
 
         currentCallback = createAdvertiseCallback()
+        val settings = AdvertiseSettings.Builder()
+            .setTxPowerLevel(advertiseTxPowerLevel)
+            .setAdvertiseMode(advertiseMode)
+            .setConnectable(true)
+            .build()
+
         advertiser?.startAdvertising(settings, data, currentCallback)
     }
 
