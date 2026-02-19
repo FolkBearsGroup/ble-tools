@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import net.moonmile.folkbears.transmitter.service.BeaconTransmitter
+import net.moonmile.folkbears.transmitter.service.Ble5BeaconTransmitter
 import net.moonmile.folkbears.transmitter.service.ENSimTransmitter
 import net.moonmile.folkbears.transmitter.service.GattAdvertise
 import net.moonmile.folkbears.transmitter.service.ManufacturerDataTransmitter
@@ -69,6 +70,8 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
     var advertiseTxPowerEn by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
     var advertiseModeMd by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
     var advertiseTxPowerMd by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
+    var advertiseModeBle5 by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
+    var advertiseTxPowerBle5 by rememberSaveable { mutableIntStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
 
     Column(modifier = modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab.ordinal) {
@@ -105,6 +108,12 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
                 advertiseTxPowerLevel = advertiseTxPowerMd,
                 onAdvertiseModeChange = { advertiseModeMd = it },
                 onAdvertiseTxPowerChange = { advertiseTxPowerMd = it }
+            )
+            TransmitterTab.Ble5 -> Ble5TransmitterTab(
+                advertiseMode = advertiseModeBle5,
+                advertiseTxPowerLevel = advertiseTxPowerBle5,
+                onAdvertiseModeChange = { advertiseModeBle5 = it },
+                onAdvertiseTxPowerChange = { advertiseTxPowerBle5 = it }
             )
         }
     }
@@ -570,7 +579,8 @@ private enum class TransmitterTab(val title: String) {
     IBeacon("iBeacon"),
     FolkBears("FolkBears"),
     EnApi("EN API"),
-    ManufacturerData("MfD")
+    ManufacturerData("MfD"),
+    Ble5("BLE5")
 }
 
 @Composable
@@ -643,5 +653,134 @@ private fun AdvertiseSettingRow(
 fun TransmitterScreenPreview() {
     FolkbearsTransmitterTheme {
         TransmitterScreen()
+    }
+}
+
+@Composable
+private fun Ble5TransmitterTab(
+    advertiseMode: Int,
+    advertiseTxPowerLevel: Int,
+    onAdvertiseModeChange: (Int) -> Unit,
+    onAdvertiseTxPowerChange: (Int) -> Unit,
+) {
+    val context = LocalContext.current
+    var majorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
+    var minorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
+    val transmitter = remember(majorHex, minorHex) { Ble5BeaconTransmitter(context, major = majorHex.toIntOrNull(16) ?: 0, minor = minorHex.toIntOrNull(16) ?: 0) }
+    var isAdvertising by rememberSaveable { mutableStateOf(false) }
+
+    fun restartIfAdvertising() {
+        if (isAdvertising) {
+            transmitter.stopTransmitter()
+            transmitter.advertiseMode = advertiseMode
+            transmitter.advertiseTxPowerLevel = advertiseTxPowerLevel
+            transmitter.startTransmitter()
+        }
+    }
+
+    var hasPermission by remember { mutableStateOf(hasScanPermissions(context)) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasPermission = result.values.all { it }
+    }
+
+    if (!hasPermission) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Bluetooth発信権限が必要です。許可してください。",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Button(
+                onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                android.Manifest.permission.BLUETOOTH_ADVERTISE,
+                                android.Manifest.permission.BLUETOOTH_CONNECT,
+                            )
+                        )
+                    } else {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                android.Manifest.permission.BLUETOOTH,
+                                android.Manifest.permission.BLUETOOTH_ADMIN,
+                            )
+                        )
+                    }
+                },
+                modifier = Modifier.padding(top = 12.dp)
+            ) {
+                Text("権限をリクエスト")
+            }
+        }
+        return
+    }
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp)) {
+        Text(text = if (isAdvertising) "BLE5 発信中" else "BLE5 停止中", style = MaterialTheme.typography.titleMedium)
+
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            OutlinedTextField(
+                value = majorHex,
+                onValueChange = { majorHex = it.filterHex(limit = 4) },
+                label = { Text("Major (hex)") },
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = minorHex,
+                onValueChange = { minorHex = it.filterHex(limit = 4) },
+                label = { Text("Minor (hex)") },
+                singleLine = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+            )
+        }
+
+        AdvertiseSettingRow(
+            advertiseMode = advertiseMode,
+            advertiseTxPowerLevel = advertiseTxPowerLevel,
+            onAdvertiseModeChange = { mode ->
+                onAdvertiseModeChange(mode)
+                transmitter.advertiseMode = mode
+                restartIfAdvertising()
+            },
+            onAdvertiseTxPowerChange = { level ->
+                onAdvertiseTxPowerChange(level)
+                transmitter.advertiseTxPowerLevel = level
+                restartIfAdvertising()
+            }
+        )
+
+        Row(modifier = Modifier.padding(top = 12.dp)) {
+            Switch(
+                checked = isAdvertising,
+                onCheckedChange = { checked ->
+                    if (checked) {
+                        transmitter.major = majorHex.toIntOrNull(16) ?: 0
+                        transmitter.minor = minorHex.toIntOrNull(16) ?: 0
+                        transmitter.advertiseMode = advertiseMode
+                        transmitter.advertiseTxPowerLevel = advertiseTxPowerLevel
+                        transmitter.startTransmitter()
+                    } else {
+                        transmitter.stopTransmitter()
+                    }
+                    isAdvertising = checked
+                }
+            )
+            Text(
+                text = if (isAdvertising) "ON" else "OFF",
+                modifier = Modifier.padding(start = 8.dp),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
