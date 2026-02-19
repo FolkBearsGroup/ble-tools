@@ -10,13 +10,17 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import android.bluetooth.le.AdvertiseSettings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -59,6 +63,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TransmitterScreen(modifier: Modifier = Modifier) {
     var selectedTab by rememberSaveable { mutableStateOf(TransmitterTab.IBeacon) }
+    var advertiseMode by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER) }
+    var advertiseTxPowerLevel by rememberSaveable { mutableStateOf(AdvertiseSettings.ADVERTISE_TX_POWER_LOW) }
 
     Column(modifier = modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = selectedTab.ordinal) {
@@ -72,7 +78,12 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
         }
 
         when (selectedTab) {
-            TransmitterTab.IBeacon -> IBeaconTransmitterTab()
+            TransmitterTab.IBeacon -> IBeaconTransmitterTab(
+                advertiseMode = advertiseMode,
+                advertiseTxPowerLevel = advertiseTxPowerLevel,
+                onAdvertiseModeChange = { advertiseMode = it },
+                onAdvertiseTxPowerChange = { advertiseTxPowerLevel = it }
+            )
             TransmitterTab.FolkBears -> FolkBearsTransmitterTab()
             TransmitterTab.EnApi -> EnApiTransmitterTab()
             TransmitterTab.ManufacturerData -> ManufacturerDataTransmitterTab()
@@ -94,12 +105,26 @@ private fun hasScanPermissions(context: Context): Boolean {
 
 
 @Composable
-private fun IBeaconTransmitterTab() {
+private fun IBeaconTransmitterTab(
+    advertiseMode: Int,
+    advertiseTxPowerLevel: Int,
+    onAdvertiseModeChange: (Int) -> Unit,
+    onAdvertiseTxPowerChange: (Int) -> Unit,
+) {
     val context = LocalContext.current
     var majorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
     var minorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
     val transmitter = remember(majorHex, minorHex) { BeaconTransmitter(context, major = majorHex.toIntOrNull(16) ?: 0, minor = minorHex.toIntOrNull(16) ?: 0) }
     var isAdvertising by rememberSaveable { mutableStateOf(false) }
+
+    fun restartIfAdvertising() {
+        if (isAdvertising) {
+            transmitter.stopTransmitter()
+            transmitter.advertiseMode = advertiseMode
+            transmitter.advertiseTxPowerLevel = advertiseTxPowerLevel
+            transmitter.startTransmitter()
+        }
+    }
 
     var hasPermission by remember { mutableStateOf(hasScanPermissions(context)) }
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -169,12 +194,73 @@ private fun IBeaconTransmitterTab() {
         }
 
         Row(modifier = Modifier.padding(top = 12.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Advertise Mode", style = MaterialTheme.typography.titleSmall)
+                var expanded by remember { mutableStateOf(false) }
+                val modes = listOf(
+                    AdvertiseSettings.ADVERTISE_MODE_LOW_POWER to "Low Power",
+                    AdvertiseSettings.ADVERTISE_MODE_BALANCED to "Balanced",
+                    AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY to "Low Latency"
+                )
+                val modeLabel = modes.firstOrNull { it.first == advertiseMode }?.second ?: "Low Power"
+                OutlinedButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
+                    Text(modeLabel)
+                }
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    modes.forEach { (mode, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                onAdvertiseModeChange(mode)
+                                transmitter.advertiseMode = mode
+                                expanded = false
+                                restartIfAdvertising()
+                            }
+                        )
+                    }
+                }
+            }
+
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp)) {
+                Text(text = "Tx Power", style = MaterialTheme.typography.titleSmall)
+                var powerExpanded by remember { mutableStateOf(false) }
+                val powers = listOf(
+                    AdvertiseSettings.ADVERTISE_TX_POWER_ULTRA_LOW to "Ultra Low",
+                    AdvertiseSettings.ADVERTISE_TX_POWER_LOW to "Low",
+                    AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM to "Medium",
+                    AdvertiseSettings.ADVERTISE_TX_POWER_HIGH to "High"
+                )
+                val powerLabel = powers.firstOrNull { it.first == advertiseTxPowerLevel }?.second ?: "Low"
+                OutlinedButton(onClick = { powerExpanded = !powerExpanded }, modifier = Modifier.fillMaxWidth()) {
+                    Text(powerLabel)
+                }
+                DropdownMenu(expanded = powerExpanded, onDismissRequest = { powerExpanded = false }) {
+                    powers.forEach { (level, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                onAdvertiseTxPowerChange(level)
+                                transmitter.advertiseTxPowerLevel = level
+                                powerExpanded = false
+                                restartIfAdvertising()
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(modifier = Modifier.padding(top = 12.dp)) {
             Switch(
                 checked = isAdvertising,
                 onCheckedChange = { checked ->
                     if (checked) {
                         transmitter.major = majorHex.toIntOrNull(16) ?: 0
                         transmitter.minor = minorHex.toIntOrNull(16) ?: 0
+                        transmitter.advertiseMode = advertiseMode
+                        transmitter.advertiseTxPowerLevel = advertiseTxPowerLevel
                         transmitter.startTransmitter()
                     } else {
                         transmitter.stopTransmitter()
