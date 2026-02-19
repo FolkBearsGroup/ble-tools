@@ -1,6 +1,7 @@
 package net.moonmile.folkbears.transmitter
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -79,6 +80,19 @@ fun TransmitterScreen(modifier: Modifier = Modifier) {
     }
 }
 
+private fun hasScanPermissions(context: Context): Boolean {
+    val adv = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED
+    val connect = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+    val legacy = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED
+    val admin = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        adv && connect
+    } else {
+        legacy && admin
+    }
+}
+
+
 @Composable
 private fun IBeaconTransmitterTab() {
     val context = LocalContext.current
@@ -86,6 +100,49 @@ private fun IBeaconTransmitterTab() {
     var minorHex by rememberSaveable { mutableStateOf((0..0xFFFF).random().toString(16).uppercase().padStart(4, '0')) }
     val transmitter = remember(majorHex, minorHex) { BeaconTransmitter(context, major = majorHex.toIntOrNull(16) ?: 0, minor = minorHex.toIntOrNull(16) ?: 0) }
     var isAdvertising by rememberSaveable { mutableStateOf(false) }
+
+    var hasPermission by remember { mutableStateOf(hasScanPermissions(context)) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasPermission = result.values.all { it }
+    }
+
+    // Collect scan results
+    LaunchedEffect(hasPermission) {
+        if (hasPermission) {
+            // 権限が設定されたときの初期化
+        }
+    }
+
+    if (!hasPermission) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Bluetoothスキャン権限が必要です。許可してください。",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Button(
+                onClick = {
+                    permissionLauncher.launch(
+                        arrayOf(
+                            android.Manifest.permission.BLUETOOTH_ADVERTISE,
+                            android.Manifest.permission.BLUETOOTH_CONNECT,
+                            android.Manifest.permission.BLUETOOTH,
+                            android.Manifest.permission.BLUETOOTH_ADMIN,
+                        )
+                    )
+                },
+                modifier = Modifier.padding(top = 12.dp)
+            ) {
+                Text("権限をリクエスト")
+            }
+        }
+        return
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()
