@@ -17,34 +17,26 @@ class BeaconTransmitter: NSObject, ObservableObject {
     @Published var useRawIBeaconAdvertising = false
     // 保持しておくアドバタイズデータ（デバッグ用）
     private var lastAdvertisementData: [String: Any]?
-    
+
     @Published var isTransmitting = false
     @Published var transmissionStatus = "停止中"
     @Published var bluetoothState = "Unknown"
-    @Published var tempUserId: String = "User UUID"
-    
+    @Published var major: UInt16 = 0
+    @Published var minor: UInt16 = 0
+
     // デフォルトのiBeacon設定
     private let defaultUUID = UUID(uuidString: "90FA7ABE-FAB6-485E-B700-1A17804CAA13")!
     private let defaultIdentifier = "FolkBearsBeacon"
-    
-    // TempUserIdから生成されるMajor/Minor
-    private var defaultMajor: CLBeaconMajorValue {
-        return generateMajorFromTempUserId()
-    }
-    
-    private var defaultMinor: CLBeaconMinorValue {
-        return generateMinorFromTempUserId()
-    }
-    
+
     override init() {
         super.init()
         setupPeripheralManager()
     }
-    
+
     private func setupPeripheralManager() {
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
     }
-    
+
     func startTransmitting() {
         guard let peripheralManager = peripheralManager,
               peripheralManager.state == .poweredOn,
@@ -52,24 +44,24 @@ class BeaconTransmitter: NSObject, ObservableObject {
             print("Bluetooth が利用できないか、既に発信中です")
             return
         }
-        
+
+        let major = CLBeaconMajorValue(major)
+        let minor = CLBeaconMinorValue(minor)
+
         // ビーコンリージョンを作成
         beaconRegion = CLBeaconRegion(
             uuid: defaultUUID,
-            major: defaultMajor,
-            minor: defaultMinor,
+            major: major,
+            minor: minor,
             identifier: defaultIdentifier
         )
-        
+
         guard let region = beaconRegion else { return }
-        
+
         // アドバタイズメントデータを生成
         if useRawIBeaconAdvertising {
             // raw manufacturer data を作成して startAdvertising する
-            let uuid = defaultUUID
-            let major = defaultMajor
-            let minor = defaultMinor
-            startAdvertisingRawIBeacon(uuid: uuid, major: UInt16(major), minor: UInt16(minor), txPower: -59)
+            startAdvertisingRawIBeacon(uuid: defaultUUID, major: UInt16(major), minor: UInt16(minor), txPower: -59)
         } else {
             // measuredPowerを明示的に設定（-59dBmが一般的）
             let peripheralData = region.peripheralData(withMeasuredPower: -59 as NSNumber)
@@ -80,17 +72,17 @@ class BeaconTransmitter: NSObject, ObservableObject {
             // アドバタイズ開始
             peripheralManager.startAdvertising(peripheralData as? [String: Any])
         }
-        
+
         isTransmitting = true
         transmissionStatus = "発信中..."
-        let majorHex = String(format: "%04X", defaultMajor)
-        let minorHex = String(format: "%04X", defaultMinor)
+        let majorHex = String(format: "%04X", major)
+        let minorHex = String(format: "%04X", minor)
         print("📡 iBeacon 発信開始")
         print("   UUID: \(defaultUUID)")
-        print("   Major: 0x\(majorHex) (\(defaultMajor))")
-        print("   Minor: 0x\(minorHex) (\(defaultMinor))")
+        print("   Major: \(majorHex)")
+        print("   Minor: \(minorHex)")
         print("   Measured Power: -59dBm")
-        
+
         // デバッグ用：アドバタイズメントデータを表示
         if useRawIBeaconAdvertising {
             if let adv = lastAdvertisementData {
@@ -98,10 +90,8 @@ class BeaconTransmitter: NSObject, ObservableObject {
             } else {
                 print("   Advertisement Data: (raw manufacturer advertising active)")
             }
-        } else {
-            if let advData = lastAdvertisementData {
-                print("   Advertisement Data: \(advData)")
-            }
+        } else if let advData = lastAdvertisementData {
+            print("   Advertisement Data: \(advData)")
         }
     }
 
@@ -138,76 +128,32 @@ class BeaconTransmitter: NSObject, ObservableObject {
 
         peripheralManager?.startAdvertising(adv)
     }
-    
+
     func stopTransmitting() {
         guard let peripheralManager = peripheralManager,
               isTransmitting else { return }
-        
+
         peripheralManager.stopAdvertising()
-        
+
         isTransmitting = false
         transmissionStatus = "停止中"
         print("iBeacon 発信停止")
     }
-    
+
     func updateBeaconParameters(major: CLBeaconMajorValue? = nil, minor: CLBeaconMinorValue? = nil) {
-        let newMajor = major ?? defaultMajor
-        let newMinor = minor ?? defaultMinor
-        
+        if let major = major { self.major = major }
+        if let minor = minor { self.minor = minor }
+
+        let newMajor = CLBeaconMajorValue(self.major)
+        let newMinor = CLBeaconMinorValue(self.minor)
+
         if isTransmitting {
             stopTransmitting()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.startTransmitting()
             }
         }
-        
         print("ビーコンパラメータ更新 - Major: \(newMajor), Minor: \(newMinor)")
-    }
-    
-    // MARK: - TempUserId からの Major/Minor 生成
-    
-    /// TempUserIdの先頭4文字から16進数でMajor値を生成
-    private func generateMajorFromTempUserId() -> CLBeaconMajorValue {
-        // 先頭4文字を取得（ハイフンを除去）
-        let cleanedId = tempUserId.replacingOccurrences(of: "-", with: "")
-        let prefix = String(cleanedId.prefix(4))
-        
-        // 16進数として解析
-        if let majorValue = UInt16(prefix, radix: 16) {
-            print("📱 Major生成: \(prefix) -> \(majorValue)")
-            return majorValue
-        }
-        
-        // フォールバック: デフォルト値
-        print("⚠️ Major生成失敗、デフォルト値1を使用")
-        return 1
-    }
-    
-    /// TempUserIdの5〜8文字目から16進数でMinor値を生成
-    private func generateMinorFromTempUserId() -> CLBeaconMinorValue {
-        let tempUserId = self.tempUserId
-        
-        // 5〜8文字目を取得（ハイフンを除去）
-        let cleanedId = tempUserId.replacingOccurrences(of: "-", with: "")
-        
-        guard cleanedId.count >= 8 else {
-            print("⚠️ Minor生成失敗（文字数不足）、デフォルト値1を使用")
-            return 1
-        }
-        
-        let startIndex = cleanedId.index(cleanedId.startIndex, offsetBy: 4)
-        let endIndex = cleanedId.index(cleanedId.startIndex, offsetBy: 8)
-        let substring = String(cleanedId[startIndex..<endIndex])
-        
-        // 16進数として解析
-        if let minorValue = UInt16(substring, radix: 16) {
-            print("📱 Minor生成: \(substring) -> \(minorValue)")
-            return minorValue
-        }
-        
-        // フォールバック: デフォルト値
-        print("⚠️ Minor生成失敗、デフォルト値1を使用")
-        return 1
     }
 }
 
@@ -241,7 +187,7 @@ extension BeaconTransmitter: CBPeripheralManagerDelegate {
             }
         }
     }
-    
+
     func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
         DispatchQueue.main.async {
             if let error = error {
@@ -256,7 +202,7 @@ extension BeaconTransmitter: CBPeripheralManagerDelegate {
             }
         }
     }
-    
+
     func peripheralManagerIsReady(toUpdateSubscribers peripheral: CBPeripheralManager) {
         print("🔄 PeripheralManagerの準備完了")
     }

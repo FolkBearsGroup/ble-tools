@@ -37,11 +37,13 @@ struct ContentView: View {
 
 struct BeaconTabView: View {
     @StateObject private var transmitter = BeaconTransmitter()
+    @State private var majorHex: String = ""
+    @State private var minorHex: String = ""
 
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("ステータス")) {
+                Section {
                     HStack {
                         Text("Bluetooth")
                         Spacer()
@@ -54,20 +56,33 @@ struct BeaconTabView: View {
                         Text(transmitter.transmissionStatus)
                             .foregroundStyle(transmitter.isTransmitting ? .green : .secondary)
                     }
+                } header: {
+                    Text("ステータス")
                 }
 
-                Section(header: Text("Temp User ID")) {
-                    TextField("例: ABCD-1234-5678", text: $transmitter.tempUserId)
+                Section {
+                    TextField("Major (4 hex)", text: $majorHex)
                         .textInputAutocapitalization(.none)
                         .autocorrectionDisabled(true)
                         .font(.system(.body, design: .monospaced))
+                        .onSubmit(applyMajorMinor)
+
+                    TextField("Minor (4 hex)", text: $minorHex)
+                        .textInputAutocapitalization(.none)
+                        .autocorrectionDisabled(true)
+                        .font(.system(.body, design: .monospaced))
+                        .onSubmit(applyMajorMinor)
+                } header: {
+                    Text("Major / Minor (hex)")
                 }
 
-                Section(header: Text("オプション")) {
+                Section {
                     Toggle("raw iBeacon manufacturer を使う", isOn: $transmitter.useRawIBeaconAdvertising)
+                } header: {
+                    Text("オプション")
                 }
 
-                Section(header: Text("操作")) {
+                Section {
                     HStack {
                         Button {
                             transmitter.startTransmitting()
@@ -83,9 +98,39 @@ struct BeaconTabView: View {
                         }
                         .disabled(!transmitter.isTransmitting)
                     }
+                } header: {
+                    Text("操作")
                 }
             }
             .navigationTitle("Beacon")
+            .onAppear(perform: syncFieldsFromModel)
+        }
+    }
+
+    private func syncFieldsFromModel() {
+        let newMajor = UInt16.random(in: 0...UInt16.max)
+        let newMinor = UInt16.random(in: 0...UInt16.max)
+        transmitter.major = newMajor
+        transmitter.minor = newMinor
+        majorHex = String(format: "%04X", newMajor)
+        minorHex = String(format: "%04X", newMinor)
+    }
+
+    private func applyMajorMinor() {
+        let cleanedMajor = majorHex.trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "0x", with: "")
+            .uppercased()
+        if let value = UInt16(cleanedMajor, radix: 16) {
+            transmitter.major = value
+            majorHex = String(format: "%04X", value)
+        }
+
+        let cleanedMinor = minorHex.trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "0x", with: "")
+            .uppercased()
+        if let value = UInt16(cleanedMinor, radix: 16) {
+            transmitter.minor = value
+            minorHex = String(format: "%04X", value)
         }
     }
 }
@@ -97,7 +142,7 @@ struct ENTabView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("ステータス")) {
+                Section {
                     HStack {
                         Text("Bluetooth")
                         Spacer()
@@ -110,9 +155,11 @@ struct ENTabView: View {
                         Text(transmitter.transmissionStatus)
                             .foregroundStyle(transmitter.isTransmitting ? .green : .secondary)
                     }
+                } header: {
+                    Text("ステータス")
                 }
 
-                Section(header: Text("設定")) {
+                Section {
                     TextField("ローカル名", text: $transmitter.localName)
                         .textInputAutocapitalization(.none)
                         .autocorrectionDisabled(true)
@@ -124,10 +171,11 @@ struct ENTabView: View {
                         .autocorrectionDisabled(true)
                         .font(.system(.body, design: .monospaced))
                         .onSubmit(applyRpi)
-
+                } header: {
+                    Text("設定")
                 }
 
-                Section(header: Text("操作")) {
+                Section {
                     HStack {
                         Button {
                             transmitter.startTransmitting()
@@ -148,6 +196,8 @@ struct ENTabView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
+                } header: {
+                    Text("操作")
                 }
             }
             .navigationTitle("EN API")
@@ -172,7 +222,7 @@ struct FolkBearsTabView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("ステータス")) {
+                Section {
                     HStack {
                         Text("Bluetooth")
                         Spacer()
@@ -191,15 +241,19 @@ struct FolkBearsTabView: View {
                         Text("\(advertiser.connectedCentrals.count) 台")
                             .foregroundStyle(.secondary)
                     }
+                } header: {
+                    Text("ステータス")
                 }
 
-                Section(header: Text("状態サマリ")) {
+                Section {
                     Text(advertiser.getConnectionSummary())
                         .font(.system(.footnote, design: .monospaced))
                         .foregroundStyle(.secondary)
+                } header: {
+                    Text("状態サマリ")
                 }
 
-                Section(header: Text("操作")) {
+                Section {
                     HStack {
                         Button {
                             advertiser.startAdvertising()
@@ -215,6 +269,8 @@ struct FolkBearsTabView: View {
                         }
                         .disabled(!advertiser.isAdvertising)
                     }
+                } header: {
+                    Text("操作")
                 }
             }
             .navigationTitle("FolkBears")
@@ -234,7 +290,7 @@ struct MfDTabView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("ステータス")) {
+                Section {
                     HStack {
                         Text("Bluetooth")
                         Spacer()
@@ -247,9 +303,11 @@ struct MfDTabView: View {
                         Text(transmitter.transmissionStatus)
                             .foregroundStyle(transmitter.isTransmitting ? .green : .secondary)
                     }
+                } header: {
+                    Text("ステータス")
                 }
 
-                Section(header: Text("ペイロード")) {
+                Section {
                     TextField("Company ID (hex)", text: $companyIdText)
                         .textInputAutocapitalization(.none)
                         .autocorrectionDisabled(true)
@@ -266,9 +324,11 @@ struct MfDTabView: View {
                         .autocorrectionDisabled(true)
                         .font(.system(.body, design: .monospaced))
                         .onSubmit(applyTempId)
+                } header: {
+                    Text("ペイロード")
                 }
 
-                Section(header: Text("操作")) {
+                Section {
                     HStack {
                         Button {
                             applyCompanyId()
@@ -286,12 +346,13 @@ struct MfDTabView: View {
                         }
                         .disabled(!transmitter.isTransmitting)
                     }
-                                        HStack {
-                    Text ("Manufacturer Data が 動作しないことを確認")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        Text ("Manufacturer Data が 動作しないことを確認")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
-
+                } header: {
+                    Text("操作")
                 }
             }
             .navigationTitle("MfD")
@@ -301,7 +362,10 @@ struct MfDTabView: View {
 
     private func syncFieldsFromModel() {
         companyIdText = String(format: "%04X", transmitter.companyId)
-        tempIdHex = transmitter.tempIdBytes.map { String(format: "%02X", $0) }.joined()
+
+        let bytes = (0..<16).map { _ in UInt8.random(in: 0...255) }
+        transmitter.tempIdBytes = Data(bytes)
+        tempIdHex = bytes.map { String(format: "%02X", $0) }.joined()
     }
 
     private func applyCompanyId() {
