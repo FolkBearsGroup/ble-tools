@@ -13,6 +13,8 @@ FolkBears を開発するときの BLE 関係のツールをまとめたもの�
 
 - folkbears-monitor-droid: iBeacon/EN API/FolkBears を受信するための Android アプリ
 - folkbears-monitor-ios: iBeacon/EN API/FolkBears を受信するための iOS アプリ
+- folkbears-transmitter-droid: iBeacon/EN API/FolkBears を送信するための Android アプリ
+- folkbears-transmitter-ios: iBeacon/FolkBears を送信するための iOS アプリ
 
 # 免責事項
 

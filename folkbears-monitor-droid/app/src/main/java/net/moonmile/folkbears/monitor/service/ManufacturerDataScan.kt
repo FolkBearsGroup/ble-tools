@@ -35,21 +35,23 @@ class ManufacturerDataScan(
         val tempid: ByteArray
     )
 
+    private var scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER
     private var scanner: BluetoothLeScanner? = null
     private var scanCallback: ScanCallback? = null
 
     // Callback invoked on each matching manufacturer record
     var onReadManufacturerData: (ManufacturerRecord) -> Unit = {}
 
-    fun startScan() {
-        Log.d(TAG, "startScan")
+    fun startScan(scanMode: Int = this.scanMode) {
+        this.scanMode = scanMode
+        Log.d(TAG, "startScan mode=$scanMode")
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val adapter = bluetoothManager.adapter ?: return
         scanner = adapter.bluetoothLeScanner ?: return
 
         val filters = buildFilters()
         val scanSettings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+            .setScanMode(scanMode)
             .build()
 
         scanCallback = object : ScanCallback() {

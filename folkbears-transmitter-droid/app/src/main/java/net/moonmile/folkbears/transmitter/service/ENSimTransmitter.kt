@@ -33,6 +33,8 @@ class ENSimTransmitter(
 
     var useAltService: Boolean = useAltService
     var tempIdBytes: ByteArray = tempIdBytes
+	var advertiseMode: Int = AdvertiseSettings.ADVERTISE_MODE_LOW_POWER
+	var advertiseTxPowerLevel: Int = AdvertiseSettings.ADVERTISE_TX_POWER_LOW
 
 	private var advertiser: BluetoothLeAdvertiser? = null
 	private var advertiseCallback: AdvertiseCallback? = null
@@ -67,8 +69,8 @@ class ENSimTransmitter(
 		}
 
 		val settings = AdvertiseSettings.Builder()
-			.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER)
-			.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
+			.setAdvertiseMode(advertiseMode)
+			.setTxPowerLevel(advertiseTxPowerLevel)
 			.setConnectable(false)
 			.build()
 

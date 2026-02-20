@@ -28,6 +28,8 @@ class BeaconTransmitter(
     private var beaconTransmitter: org.altbeacon.beacon.BeaconTransmitter? = null
     var major: Int = major
     var minor: Int = minor
+    var advertiseMode: Int = AdvertiseSettings.ADVERTISE_MODE_LOW_POWER
+    var advertiseTxPowerLevel: Int = AdvertiseSettings.ADVERTISE_TX_POWER_LOW
 
     private fun startBeaconTransmission() {
         // Permission check (Android 12+ requires BLUETOOTH_ADVERTISE)
@@ -68,17 +70,14 @@ class BeaconTransmitter(
 
         // val beaconParser = BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT)
         val beaconParser = BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")
-        val beaconTransmitter = BeaconTransmitter(context, beaconParser).apply {
-            advertiseMode = AdvertiseSettings.ADVERTISE_MODE_LOW_POWER // 消費電力最小化
-            advertiseTxPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_LOW // 出力弱め
-
-            // advertiseMode = AdvertiseSettings .ADVERTISE_MODE_LOW_LATENCY   // 発信間隔を最短に
-            // advertiseTxPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_HIGH // 出力強め
-            isConnectable = false                                          // 非コネクタブルに
+        val altBeaconTransmitter = BeaconTransmitter(context, beaconParser).apply {
+            advertiseMode = this@BeaconTransmitter.advertiseMode
+            advertiseTxPowerLevel = this@BeaconTransmitter.advertiseTxPowerLevel
+            isConnectable = false // 非コネクタブルに
         }
 
         try {
-            beaconTransmitter?.startAdvertising(beacon, object : AdvertiseCallback() {
+            altBeaconTransmitter?.startAdvertising(beacon, object : AdvertiseCallback() {
                 override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
                     Log.d(TAG, "iBeacon 発信開始")
                 }
