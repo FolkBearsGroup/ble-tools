@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat
 import android.bluetooth.le.ScanSettings
 import net.moonmile.folkbears.monitor.data.IBeaconAdvertisement
 import net.moonmile.folkbears.monitor.data.TraceDataEntity
+import net.moonmile.folkbears.monitor.service.Ble5IBeaconScan
 import net.moonmile.folkbears.monitor.service.BeaconScan
 import net.moonmile.folkbears.monitor.service.ENSimScan
 import net.moonmile.folkbears.monitor.service.GattClient
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
 fun MonitorScreen(modifier: Modifier = Modifier) {
     var selectedTab by rememberSaveable { mutableStateOf(MonitorTab.IBeacon) }
     var iBeaconScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
+    var ble5ScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
     var folkScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
     var enApiScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
     var mdScanMode by rememberSaveable { mutableStateOf(ScanSettings.SCAN_MODE_LOW_POWER) }
@@ -97,6 +99,10 @@ fun MonitorScreen(modifier: Modifier = Modifier) {
             MonitorTab.ManufacturerData -> ManufacturerDataTabContent(
                 scanMode = mdScanMode,
                 onScanModeChange = { mdScanMode = it }
+            )
+            MonitorTab.Ble5 -> Ble5IBeaconTabContent(
+                scanMode = ble5ScanMode,
+                onScanModeChange = { ble5ScanMode = it }
             )
         }
     }
@@ -200,6 +206,141 @@ private fun IBeaconTabContent(
                 }
             }
         }
+    if (!hasPermission) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Bluetoothスキャン権限が必要です。許可してください。",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Button(
+                onClick = {
+                    permissionLauncher.launch(
+                        arrayOf(
+                            android.Manifest.permission.BLUETOOTH_SCAN,
+                            android.Manifest.permission.BLUETOOTH_CONNECT,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                    )
+                },
+                modifier = Modifier.padding(top = 12.dp)
+            ) {
+                Text("権限をリクエスト")
+            }
+        }
+        return
+    }
+
+    val grouped = ads.groupBy { Triple(it.serviceUuid, it.major, it.minor) }
+        .map { (key, values) ->
+            val last = values.maxByOrNull { it.timestamp }!!
+            IBeaconRowData(
+                serviceUuid = key.first,
+                major = key.second,
+                minor = key.third,
+                count = values.size,
+                lastSeen = last.timestamp,
+                rssi = last.rssi,
+                txPower = last.txPower
+            )
+        }
+        .sortedByDescending { it.lastSeen }
+
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(grouped, key = { "${it.serviceUuid}-${it.major}-${it.minor}" }) { row ->
+            IBeaconRow(row)
+        }
+    }
+}
+
+@Composable
+private fun Ble5IBeaconTabContent(
+    scanMode: Int,
+    onScanModeChange: (Int) -> Unit
+) {
+    val context = LocalContext.current
+    val scan = remember { Ble5IBeaconScan(context) }
+    val ads: SnapshotStateList<IBeaconAdvertisement> = remember { mutableStateListOf() }
+    val windowMs = 5 * 60 * 1000L // 5 minutes
+
+    var hasPermission by remember { mutableStateOf(hasScanPermissions(context)) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { result ->
+        hasPermission = result.values.all { it }
+    }
+
+    LaunchedEffect(scan, hasPermission, scanMode) {
+        if (hasPermission) {
+            scan.stopScan()
+            scan.onIBeacon = { ad ->
+                ads.add(ad)
+                pruneOld(ads, windowMs)
+            }
+            scan.startScan(scanMode)
+        }
+    }
+
+    LaunchedEffect(ads) {
+        while (true) {
+            pruneOld(ads, windowMs)
+            delay(10_000)
+        }
+    }
+
+    DisposableEffect(hasPermission) {
+        onDispose { scan.stopScan() }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "スキャンモード",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        var expanded by remember { mutableStateOf(false) }
+        val modes = listOf(
+            ScanSettings.SCAN_MODE_LOW_POWER to "Low Power",
+            ScanSettings.SCAN_MODE_BALANCED to "Balanced",
+            ScanSettings.SCAN_MODE_LOW_LATENCY to "Low Latency",
+        )
+        val currentLabel = modes.find { it.first == scanMode }?.second ?: "Low Power"
+
+        androidx.compose.material3.OutlinedButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        ) {
+            Text(currentLabel)
+        }
+
+        if (expanded) {
+            androidx.compose.material3.DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                modes.forEach { (mode, label) ->
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            onScanModeChange(mode)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     if (!hasPermission) {
         Column(
             modifier = Modifier
@@ -734,7 +875,8 @@ private enum class MonitorTab(val title: String, val contentLabel: String) {
     IBeacon("iBeacon", "iBeacon の受信結果をここに表示します"),
     FolkBears("FolkBears", "FolkBears の受信結果をここに表示します"),
     EnApi("EN API", "EN API モードの受信結果をここに表示します"),
-    ManufacturerData("MD", "Manufacturer Data の受信結果をここに表示します")
+    ManufacturerData("MD", "Manufacturer Data の受信結果をここに表示します"),
+    Ble5("BLE5", "BLE5 拡張広告の iBeacon をここに表示します")
 }
 
 @Preview(showBackground = true)
